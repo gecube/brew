@@ -55,6 +55,21 @@ RSpec.describe Cask::CaskLoader::FromPathLoader do
       end
     end
 
+    context "with a corrupt installed JSON cask file" do
+      let(:sourcefile_path) do
+        (mktmpdir/"broken.json").tap do |path|
+          path.write("{")
+        end
+      end
+
+      it "raises CaskUnreadableError" do
+        loader = described_class.new(sourcefile_path)
+        loader.instance_variable_set(:@from_installed_caskfile, true)
+
+        expect { loader.load(config: nil) }.to raise_error(Cask::CaskUnreadableError)
+      end
+    end
+
     context "with an internal JSON cask file" do
       let(:sourcefile_path) { TEST_FIXTURE_DIR/"cask/everything.internal.json" }
 
