@@ -26,7 +26,8 @@ module Homebrew
       # List all available services with status, user, and path to the file.
       sig { returns(T::Array[T::Hash[Symbol, T.anything]]) }
       def self.services_list
-        available_services.map(&:to_hash)
+        # FormulaWrapper#to_hash queries `launchctl`/`systemctl` for each service.
+        Utils.parallel_map(available_services, &:to_hash)
       end
     end
   end

@@ -4,6 +4,19 @@
 require "utils"
 
 RSpec.describe Utils do
+  describe ".parallel_map" do
+    it "maps concurrently, preserving order" do
+      expect(described_class.parallel_map([3, 1, 2]) do |i|
+        sleep(0.05 - (i * 0.01))
+        i * 10
+      end).to eq [30, 10, 20]
+    end
+
+    it "re-raises the first exception" do
+      expect { described_class.parallel_map([1]) { raise "boom" } }.to raise_error("boom")
+    end
+  end
+
   describe ".deconstantize" do
     it "removes the rightmost segment from the constant expression in the string" do
       expect(described_class.deconstantize("Net::HTTP")).to eq("Net")

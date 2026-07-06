@@ -6,7 +6,7 @@ require "services/formulae"
 RSpec.describe Homebrew::Services::Formulae do
   describe "#services_list" do
     it "empty list without available formulae" do
-      allow(described_class).to receive(:available_services).and_return({})
+      allow(described_class).to receive(:available_services).and_return([])
       expect(described_class.services_list).to eq([])
     end
 
