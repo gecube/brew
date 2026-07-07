@@ -23,7 +23,7 @@ RSpec.describe GitHubRunnerMatrix, :no_api do
 
   before do
     allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with("HOMEBREW_LINUX_RUNNER").and_return("ubuntu-latest")
+    allow(ENV).to receive(:fetch).with("HOMEBREW_LINUX_SELF_HOSTED", "false").and_return("false")
     allow(ENV).to receive(:fetch).with("HOMEBREW_MACOS_LONG_TIMEOUT", "false").and_return("false")
     allow(ENV).to receive(:fetch).with("HOMEBREW_MACOS_BUILD_ON_GITHUB_RUNNER", "false").and_return("false")
     allow(ENV).to receive(:fetch).with("GITHUB_RUN_ID").and_return("12345")
@@ -99,7 +99,7 @@ RSpec.describe GitHubRunnerMatrix, :no_api do
 
           expect(runner_matrix.runners.all?(&:active)).to be(false)
           expect(runner_matrix.runners.any?(&:active)).to be(true)
-          expect(get_runner_names(runner_matrix)).to eq(["Linux x86_64", "Linux arm64"])
+          expect(get_runner_names(runner_matrix)).to eq(["Linux arm64", "Linux x86_64"])
         end
       end
 
@@ -316,11 +316,11 @@ RSpec.describe GitHubRunnerMatrix, :no_api do
               allow(Formula).to receive(:all).and_return([testball, testball_depender_linux].map(&:formula))
 
               matrix = described_class.new([testball], ["deleted"], all_supported: false, dependent_matrix: true)
-              expect(get_runner_names(matrix)).to eq(["Linux x86_64", "Linux arm64"])
+              expect(get_runner_names(matrix)).to eq(["Linux arm64", "Linux x86_64"])
 
-              allow(ENV).to receive(:[]).with("HOMEBREW_LINUX_RUNNER").and_return("linux-self-hosted-1")
+              allow(ENV).to receive(:fetch).with("HOMEBREW_LINUX_SELF_HOSTED", "false").and_return("true")
               matrix = described_class.new([testball], ["deleted"], all_supported: false, dependent_matrix: true)
-              expect(get_runner_names(matrix)).to eq(["Linux x86_64"])
+              expect(get_runner_names(matrix)).to eq(["Linux arm64", "Linux x86_64"])
             end
           end
 
